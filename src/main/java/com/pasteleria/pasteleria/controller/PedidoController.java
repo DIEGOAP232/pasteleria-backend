@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,41 +17,42 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
-    // ------------------------------------------------------------------
-    // ENDPOINT 1: CREAR PEDIDO
-    // Rutas: /api/pedidos
-    // Acceso: Cliente o Administrador (usa @PreAuthorize en lugar de SecurityConfig)
-    // ------------------------------------------------------------------
-    @PostMapping("/pedidos")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAuthority('Cliente') or hasAuthority('Administrador')")
-    public ResponseEntity<Pedido> crearPedido(@RequestBody CrearPedidoRequest request) {
-        try {
-            Pedido nuevoPedido = pedidoService.crearPedido(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoPedido);
-        } catch (RuntimeException e) {
-            // Manejo de errores de validación (ej: producto no encontrado)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        }
-    }
+    // ----------------------------------------------------------------------
+    // RUTAS DE CLIENTE
+    // ----------------------------------------------------------------------
 
-    // ------------------------------------------------------------------
-    // ENDPOINT 2: ACTUALIZAR ESTADO
-    // Rutas: /api/admin/pedidos/{id}/estado
-    // Acceso: SOLO Administrador
-    // ------------------------------------------------------------------
-    @PutMapping("/admin/pedidos/{id}/estado")
-    @PreAuthorize("hasAuthority('Administrador')")
-    public ResponseEntity<Pedido> actualizarEstado(
-            @PathVariable Long id, 
-            @RequestParam String nuevoEstado) {
-        try {
-            Pedido pedidoActualizado = pedidoService.actualizarEstado(id, nuevoEstado);
-            return ResponseEntity.ok(pedidoActualizado);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    // POST /api/pedidos
+    // Crea un nuevo pedido. Requiere JWT (Cliente/Admin).
+    @PostMapping("/pedidos")
+    @PreAuthorize("hasAnyAuthority('Cliente', 'Administrador')")
+    public ResponseEntity<Pedido> crearPedido(
+            @RequestBody CrearPedidoRequest request,
+            Authentication authentication) {
+        
+        // 💡 EXTRAEMOS EL EMAIL DEL TOKEN JWT DE FORMA SEGURA
+        String emailCliente = authentication.getName(); 
+        
+        Pedido nuevoPedido = pedidoService.crearPedido(request, emailCliente);
+        return new ResponseEntity<>(nuevoPedido, HttpStatus.CREATED);
     }
     
-    // Aquí irían otros endpoints CRUD (GET /pedidos, GET /pedidos/{id})
+    // Asumo que tienes un método GET para obtener los pedidos del usuario autenticado aquí
+
+
+    // ----------------------------------------------------------------------
+    // RUTAS DE ADMINISTRADOR
+    // ----------------------------------------------------------------------
+    
+    // PUT /api/admin/pedidos/{id}/estado
+    @PutMapping("/admin/pedidos/{idPedido}/estado")
+    @PreAuthorize("hasAuthority('Administrador')")
+    public ResponseEntity<Pedido> actualizarEstadoPedido(
+            @PathVariable Long idPedido,
+            @RequestBody String nuevoEstado) { 
+        
+        Pedido pedidoActualizado = pedidoService.actualizarEstado(idPedido, nuevoEstado);
+        return ResponseEntity.ok(pedidoActualizado);
+    }
+    
+    // Asumo que tienes un método GET para obtener todos los pedidos aquí
 }

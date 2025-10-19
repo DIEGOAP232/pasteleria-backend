@@ -3,6 +3,7 @@ package com.pasteleria.pasteleria.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "Pedido")
@@ -28,4 +29,8 @@ public class Pedido {
     // Campos adicionales de tu tabla de BD
     private String direccionEntrega;
     private String telefonoContacto;
+    public void setDetalles(List<DetallePedido> detallesDelPedido) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setDetalles'");
+    }
 }
