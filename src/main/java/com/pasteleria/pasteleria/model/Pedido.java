@@ -9,7 +9,10 @@ import java.util.List;
 @Table(name = "Pedido")
 @Data
 public class Pedido {
-
+    @ManyToMany
+    @JoinTable(name = "pedido_detaalle",
+            joinColumns = @JoinColumn(name = "pedido_id"),
+            inverseJoinColumns = @JoinColumn(name = "detalle_pedido_id"))
     private List<DetallePedido> detalles;
 
 

@@ -10,6 +10,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(exclude = {"detallePedido"})
 public class DetallePersonalizacion {
 
+    // Relación Many-to-One: Muchas personalizaciones pueden pertenecer a una personalización
+    @ManyToOne
+    @JoinColumn(name = "id_personalizacion", nullable = false)
     private Personalizacion personalizacion;
 
     @Id

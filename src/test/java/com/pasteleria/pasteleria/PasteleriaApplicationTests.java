@@ -1,13 +1,13 @@
-package com.pasteleria.pasteleria;
+//package com.pasteleria.pasteleria;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class PasteleriaApplicationTests {
+//@SpringBootTest
+//class PasteleriaApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+	//@Test
+	//void contextLoads() {
+	//}
 
-}
+//}

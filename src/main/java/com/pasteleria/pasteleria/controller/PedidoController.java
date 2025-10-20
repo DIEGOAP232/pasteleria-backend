@@ -1,6 +1,7 @@
 package com.pasteleria.pasteleria.controller;
 
 import com.pasteleria.pasteleria.dto.CrearPedidoRequest;
+import com.pasteleria.pasteleria.dto.PagoRequestDTO;
 import com.pasteleria.pasteleria.model.Pedido;
 import com.pasteleria.pasteleria.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,14 @@ public class PedidoController {
         List<Pedido> pedidos = pedidoService.obtenerPedidosPorUsuario(emailCliente);
         return ResponseEntity.ok(pedidos);
     }
+
+    @PostMapping("/pedidos/pago")
+    @PreAuthorize("hasAnyAuthority('Cliente', 'Administrador')")
+    public ResponseEntity<?> registrarPago(@RequestBody PagoRequestDTO request) {
+        pedidoService.registrarPago(request);
+        return ResponseEntity.ok("Pago registrado correctamente");
+    }
+
 
     // -------------------- RUTAS DE ADMIN --------------------
 
