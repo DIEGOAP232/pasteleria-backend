@@ -42,8 +42,25 @@ public class ProductoService {
         return productoRepository.save(producto);
     }
 
+     // ✅ Actualizar producto existente
+    public Optional<Producto> actualizarProducto(Long id, Producto productoActualizado) {
+        return productoRepository.findById(id).map(producto -> {
+            producto.setNombre(productoActualizado.getNombre());
+            producto.setDescripcion(productoActualizado.getDescripcion());
+            producto.setPrecioBase(productoActualizado.getPrecioBase());
+            producto.setEstado(productoActualizado.getEstado());
+            producto.setStock(productoActualizado.getStock());
+            return productoRepository.save(producto);
+        });
+    }
+
     // Eliminar un producto
-    public void eliminarProducto(Long id) {
-        productoRepository.deleteById(id);
+        public boolean eliminarProducto(Long id) {
+        if (productoRepository.existsById(id)) {
+            productoRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
+

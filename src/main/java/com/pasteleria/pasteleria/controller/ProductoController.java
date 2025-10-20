@@ -37,4 +37,20 @@ public class ProductoController {
             Producto nuevoProducto = productoService.guardarProducto(producto);
                 return ResponseEntity.ok(nuevoProducto);
     }
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
+        return productoService.actualizarProducto(id, producto)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // DELETE /api/productos/eliminar/{id} -> Eliminar producto
+        @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
+        boolean eliminado = productoService.eliminarProducto(id);
+        if (!eliminado) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
+    }
 }
