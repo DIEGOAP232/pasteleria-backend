@@ -16,6 +16,7 @@ public class ProductoController {
     public ProductoController(ProductoService productoService) {
         this.productoService = productoService;
     }
+    
 
     // GET /api/productos -> Todos los productos
     @GetMapping
@@ -29,5 +30,11 @@ public class ProductoController {
         return productoService.obtenerProductoPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/crear")
+        public ResponseEntity<Producto> crearProducto(@RequestBody Producto producto) {
+            Producto nuevoProducto = productoService.guardarProducto(producto);
+                return ResponseEntity.ok(nuevoProducto);
     }
 }
