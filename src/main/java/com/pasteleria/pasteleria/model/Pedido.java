@@ -9,6 +9,10 @@ import java.util.List;
 @Table(name = "Pedido")
 @Data
 public class Pedido {
+
+    private List<DetallePedido> detalles;
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idPedido;
@@ -29,8 +33,11 @@ public class Pedido {
     // Campos adicionales de tu tabla de BD
     private String direccionEntrega;
     private String telefonoContacto;
-    public void setDetalles(List<DetallePedido> detallesDelPedido) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setDetalles'");
+   public void setDetalles(List<DetallePedido> detallesDelPedido) {
+        this.detalles = detallesDelPedido;
+    }
+
+    public List<DetallePedido> getDetalles() {
+        return detalles;
     }
 }

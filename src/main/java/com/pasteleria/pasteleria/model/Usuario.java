@@ -26,7 +26,7 @@ public class Usuario implements UserDetails {
     
     // Contraseña cifrada con BCrypt
     @Column(nullable = false)
-    private String contraseña; 
+    private String contrasena; 
 
     private String telefono;
     private String direccion;
@@ -43,7 +43,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public String getPassword() {
-        return contraseña; // Retorna el hash
+        return contrasena; // Retorna el hash
     }
 
     @Override

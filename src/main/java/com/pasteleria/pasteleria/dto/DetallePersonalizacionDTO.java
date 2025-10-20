@@ -4,11 +4,7 @@ import lombok.Data;
 
 @Data
 public class DetallePersonalizacionDTO {
-    private String tipo;      // Ej: "Texto", "Color", "Forma"
+    private Long idPersonalizacion; // necesario para enlazar con la tabla
+    private String tipo;      
     private String valor;
-    public Long getIdPersonalizacion() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIdPersonalizacion'");
-    }
-    
 }

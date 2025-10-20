@@ -2,66 +2,38 @@ package com.pasteleria.pasteleria.service;
 
 import com.pasteleria.pasteleria.model.Producto;
 import com.pasteleria.pasteleria.repository.ProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+import java.util.Optional;
 
 @Service
 public class ProductoService {
 
-    @Autowired
-    private ProductoRepository productoRepository;
+    private final ProductoRepository productoRepo;
 
-    // ----------------------------------------------------
-    // C - CREAR PRODUCTO
-    // ----------------------------------------------------
-    public Producto crearProducto(Producto producto) {
-        // Aquí podrías añadir lógica de validación antes de guardar
-        return productoRepository.save(producto);
+    public ProductoService(ProductoRepository productoRepo) {
+        this.productoRepo = productoRepo;
     }
 
-    // ----------------------------------------------------
-    // R - LEER TODOS (Catálogo Público)
-    // ----------------------------------------------------
+    // Obtener todos los productos
     public List<Producto> obtenerTodosLosProductos() {
-        return productoRepository.findAll();
-    }
-    
-    // ----------------------------------------------------
-    // R - LEER POR ID
-    // ----------------------------------------------------
-    public Producto obtenerProductoPorId(Long id) {
-        // Usamos orElseThrow para lanzar una excepción si no se encuentra
-        return productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
+        return productoRepo.findAll();
     }
 
-    // ----------------------------------------------------
-    // U - ACTUALIZAR
-    // ----------------------------------------------------
-    public Producto actualizarProducto(Long id, Producto detallesProducto) {
-        Producto productoExistente = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + id));
-        
-        // Actualizar los campos: debes mapear los campos relevantes aquí.
-        // Ejemplo simple (asumiendo que tu entidad Producto tiene getters/setters):
-        productoExistente.setNombre(detallesProducto.getNombre());
-        productoExistente.setPrecioBase(detallesProducto.getPrecioBase());
-        productoExistente.setStock(detallesProducto.getStock());
-        // ... (Añadir más campos como descripción, categoría, imagen, etc.)
-        
-        return productoRepository.save(productoExistente);
+    // Obtener un producto por ID usando Optional
+    public Optional<Producto> obtenerProductoPorId(Long id) {
+        return productoRepo.findById(id);
     }
 
-    // ----------------------------------------------------
-    // D - ELIMINAR
-    // ----------------------------------------------------
-    public void eliminarProducto(Long id) {
-        if (!productoRepository.existsById(id)) {
-            throw new RuntimeException("Producto no encontrado con ID: " + id);
-        }
-        productoRepository.deleteById(id);
-    }
+    // Guardar o actualizar un producto
+public Producto guardarProducto(Producto producto) {
+    return productoRepo.save(producto);
+}
+
+// Eliminar producto
+public void eliminarProducto(Long id) {
+    productoRepo.deleteById(id);
+}
+
 }

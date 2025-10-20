@@ -10,6 +10,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(exclude = {"detallePedido"})
 public class DetallePersonalizacion {
 
+    private Personalizacion personalizacion;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -22,8 +24,6 @@ public class DetallePersonalizacion {
     private String tipo;
     private String valor;
     // private Double costoAdicional; 
-    public void setPersonalizacion(Personalizacion pers) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPersonalizacion'");
-    }
+       public void setPersonalizacion(Personalizacion pers) { this.personalizacion = pers; }
+    public Personalizacion getPersonalizacion() { return personalizacion; }
 }

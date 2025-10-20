@@ -3,6 +3,7 @@ package com.pasteleria.pasteleria.service;
 import com.pasteleria.pasteleria.dto.CrearPedidoRequest;
 import com.pasteleria.pasteleria.dto.DetallePedidoDTO;
 import com.pasteleria.pasteleria.dto.DetallePersonalizacionDTO;
+import com.pasteleria.pasteleria.dto.PagoRequestDTO;
 import com.pasteleria.pasteleria.model.*;
 import com.pasteleria.pasteleria.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +25,15 @@ public class PedidoService {
     @Autowired private PersonalizacionRepository personalizacionRepository;
     @Autowired private ProductoRepository productoRepository;
 
-    // 💡 CORRECCIÓN 1: Recibe el emailCliente del JWT, no un ID del Request.
     @Transactional 
     public Pedido crearPedido(CrearPedidoRequest request, String emailCliente) { 
-        
-        // 1. Obtener el cliente de forma segura usando el email del token
         Usuario cliente = usuarioRepository.findByEmail(emailCliente)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado: " + emailCliente));
-        
-        // 2. Crear la cabecera del Pedido
         Pedido pedido = new Pedido();
         pedido.setUsuario(cliente);
         pedido.setFecha(LocalDateTime.now());
         pedido.setEstado("PENDIENTE_PAGO"); // Estado inicial antes de la confirmación final
         pedido.setDireccionEntrega(request.getDireccionEntrega()); // Asumiendo que existe este campo en Pedido
-        
-        // Guarda la cabecera para obtener el ID y asociar los detalles
         pedido = pedidoRepository.save(pedido); 
 
         Double totalCalculadoBackend = 0.0;
@@ -100,7 +94,7 @@ public class PedidoService {
         Pago pago = new Pago();
         pago.setPedido(pedido);
         pago.setMonto(totalCalculadoBackend); // Usamos el total calculado en el backend
-        pago.setMetodo(request.getMmetodopago()); // Asumo que el campo es 'metodoPago'
+        pago.setMetodo(request.getMetodoPago()); // Asumo que el campo es 'metodoPago'
         pago.setEstado("Completado");
         pago.setFecha(LocalDateTime.now());
         pagoRepository.save(pago);
@@ -118,4 +112,28 @@ public class PedidoService {
         pedido.setEstado(nuevoEstado);
         return pedidoRepository.save(pedido);
     }
+
+     public List<Pedido> obtenerTodosLosPedidos() {
+        return pedidoRepository.findAll();
+    }
+
+     public List<Pedido> obtenerPedidosPorUsuario(String email) {
+        return pedidoRepository.findByUsuarioEmail(email);
+    }
+
+    @Transactional
+     public void registrarPago(PagoRequestDTO request) {
+        Pedido pedido = pedidoRepository.findById(request.getPedidoId())
+            .orElseThrow(() -> new RuntimeException("Pedido no encontrado"));
+
+            Pago pago = new Pago();
+            pago.setPedido(pedido);
+            pago.setMonto(request.getMonto());
+            pago.setMetodo(request.getMetodoPago());
+            pago.setEstado("Completado");
+            pago.setFecha(LocalDateTime.now());
+
+            pagoRepository.save(pago);
+    }
 }
+

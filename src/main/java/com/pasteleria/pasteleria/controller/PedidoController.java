@@ -10,6 +10,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class PedidoController {
@@ -17,42 +19,46 @@ public class PedidoController {
     @Autowired
     private PedidoService pedidoService;
 
-    // ----------------------------------------------------------------------
-    // RUTAS DE CLIENTE
-    // ----------------------------------------------------------------------
+    // -------------------- RUTAS DE CLIENTE --------------------
 
-    // POST /api/pedidos
-    // Crea un nuevo pedido. Requiere JWT (Cliente/Admin).
+    // Crear pedido
     @PostMapping("/pedidos")
     @PreAuthorize("hasAnyAuthority('Cliente', 'Administrador')")
     public ResponseEntity<Pedido> crearPedido(
             @RequestBody CrearPedidoRequest request,
             Authentication authentication) {
-        
-        // 💡 EXTRAEMOS EL EMAIL DEL TOKEN JWT DE FORMA SEGURA
-        String emailCliente = authentication.getName(); 
-        
+
+        String emailCliente = authentication.getName();
         Pedido nuevoPedido = pedidoService.crearPedido(request, emailCliente);
         return new ResponseEntity<>(nuevoPedido, HttpStatus.CREATED);
     }
-    
-    // Asumo que tienes un método GET para obtener los pedidos del usuario autenticado aquí
 
+    // Obtener pedidos del usuario autenticado
+    @GetMapping("/pedidos/mios")
+    @PreAuthorize("hasAnyAuthority('Cliente', 'Administrador')")
+    public ResponseEntity<List<Pedido>> obtenerMisPedidos(Authentication authentication) {
+        String emailCliente = authentication.getName();
+        List<Pedido> pedidos = pedidoService.obtenerPedidosPorUsuario(emailCliente);
+        return ResponseEntity.ok(pedidos);
+    }
 
-    // ----------------------------------------------------------------------
-    // RUTAS DE ADMINISTRADOR
-    // ----------------------------------------------------------------------
-    
-    // PUT /api/admin/pedidos/{id}/estado
+    // -------------------- RUTAS DE ADMIN --------------------
+
+    // Obtener todos los pedidos
+    @GetMapping("/admin/pedidos")
+    @PreAuthorize("hasAuthority('Administrador')")
+    public ResponseEntity<List<Pedido>> obtenerTodosLosPedidos() {
+        return ResponseEntity.ok(pedidoService.obtenerTodosLosPedidos());
+    }
+
+    // Actualizar estado de un pedido
     @PutMapping("/admin/pedidos/{idPedido}/estado")
     @PreAuthorize("hasAuthority('Administrador')")
     public ResponseEntity<Pedido> actualizarEstadoPedido(
             @PathVariable Long idPedido,
-            @RequestBody String nuevoEstado) { 
-        
+            @RequestBody String nuevoEstado) {
+
         Pedido pedidoActualizado = pedidoService.actualizarEstado(idPedido, nuevoEstado);
         return ResponseEntity.ok(pedidoActualizado);
     }
-    
-    // Asumo que tienes un método GET para obtener todos los pedidos aquí
 }
